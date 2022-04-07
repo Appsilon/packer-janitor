@@ -1,0 +1,25 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request_target:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: "Checkout source code"
+
+      - uses: actions/setup-python@v2
+        name: "SETUP: Python"
+        with:
+          python-version: "3.9"
+
+      - uses: aws-actions/setup-sam@v1
+        name: "SETUP: sam"
+
+      - name: "RUN: sam build"
+        run: sam build

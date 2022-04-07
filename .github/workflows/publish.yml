@@ -1,0 +1,41 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: "Checkout source code"
+        uses: actions/checkout@v2
+
+      - name: "SETUP: Python"
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+
+      - name: "SETUP: sam"
+        uses: aws-actions/setup-sam@v1
+
+      - name: "SETUP: zip"
+        uses: montudor/action-zip@v1
+
+      - name: "RUN: sam build"
+        run: sam build
+
+      - name: "RUN: create zip archive"
+        run: |
+          cd .aws-sam/build/PackerJanitorFunction && zip -r ../../../deployment.zip *
+
+      - name: "Release"
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            LICENSE
+            deployment.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,44 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "automerge": false,
+      "matchUpdateTypes": [
+        "patch",
+        "pin",
+        "digest",
+        "minor"
+      ]
+    },
+    {
+      "matchUpdateTypes": [
+        "major"
+      ]
+    },
+    {
+      "automerge": false,
+      "groupName": "dependencies",
+      "managers": [
+        "pipenv",
+        "pre-commit"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    }
+  ],
+  "prConcurrentLimit": 2,
+  "schedule": [
+    "every weekday",
+    "after 9am and before 5pm"
+  ],
+  "separateMinorPatch": true,
+  "timezone": "Europe/Warsaw",
+  "reviewersFromCodeOwners": true
+}

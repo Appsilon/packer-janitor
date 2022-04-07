@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  packer-janitor
+
+  Sample SAM Template for packer-janitor
+
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  PackerJanitorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: main.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt PackerJanitorIamRole.Arn
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: "cron(0 0 * * ? *)"
+            Name: PackerJanitorSchedule
+            Description: packer janitor schedule
+            Enabled: true
+      Environment:
+        Variables:
+          SLACK_WEBHOOK_URL: VALUE
+  PackerJanitorIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: lambda.amazonaws.com
+      Policies:
+        - PolicyName: "packer-janitor-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "ec2:DeleteKeyPair"
+                  - "ec2:DeleteSecurityGroup"
+                  - "ec2:DescribeInstances"
+                  - "ec2:DescribeKeyPairs"
+                  - "ec2:DescribeSecurityGroups"
+                  - "ec2:TerminateInstances"
+                  - "iam:ListAccountAliases"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+
+Outputs:
+  PackerJanitorFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt PackerJanitorFunction.Arn
