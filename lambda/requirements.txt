@@ -1,2 +1,2 @@
 boto3==1.18.8
-datetime==4.3
+datetime==4.9
